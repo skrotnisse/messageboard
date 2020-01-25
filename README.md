@@ -50,3 +50,15 @@ After the image has been created it can be run as a container (include -d to det
 ```
 sudo docker run --rm -p 5000:5000 messageboardservice
 ```
+
+# Service access
+
+The service is running a REST API accessible at http://localhost:5000/api.
+
+| URI offset     | Method        | Params  | Description                        |
+| -------------- |:-------------:| -------:| ---------------------------------- |
+| /Messages      | GET           |         | Returns a list of all messages.    |
+| /Messages      | POST          |         | Adds a new message.                |
+| /Messages/{id} | PUT           |         | Updates an existing message by ID. |
+| /Messages/{id} | GET           |         | Returns a single message by ID.    |
+| /Messages/{id} | DELETE        |         | Deletes a single message by ID.    |
