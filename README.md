@@ -39,7 +39,7 @@ Note: Running the tests for the first time requires dependencies to be downloade
 
 # Deployment using Docker
 
-This requires docker to be installed. Create a docker image from project-root by:
+This requires docker to be installed. Create a docker image from the /MessageBoardService directory by:
 ```
 sudo docker build -t messageboardservice .
 ```
