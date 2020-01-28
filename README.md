@@ -65,6 +65,7 @@ The service is running a REST API accessible at http://localhost:5000/api.
 | /Messages/{id} | DELETE        | Deletes a single message by ID.                                           |
 
 A couple of dummy users have been pre hard-coded for the login-service:
+
 | Id | First name | Last name | Username | Password |
 | --:| ---------- | --------- | -------- | -------- |
 |  1 | John       | Crichton  | john     | secret   |
