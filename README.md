@@ -55,10 +55,24 @@ sudo docker run --rm -p 5000:5000 messageboardservice
 
 The service is running a REST API accessible at http://localhost:5000/api.
 
-| URI offset     | Method        | Params  | Description                        |
-| -------------- |:-------------:| -------:| ---------------------------------- |
-| /Messages      | GET           |         | Returns a list of all messages.    |
-| /Messages      | POST          |         | Adds a new message.                |
-| /Messages/{id} | PUT           |         | Updates an existing message by ID. |
-| /Messages/{id} | GET           |         | Returns a single message by ID.    |
-| /Messages/{id} | DELETE        |         | Deletes a single message by ID.    |
+| URI offset     | Method        | Description                                                               |
+| -------------- |:-------------:| ------------------------------------------------------------------------- |
+| /Login         | POST          | User authentication required before managing messages (generates JWT).    |
+| /Messages      | GET           | Returns a list of all messages.                                           |
+| /Messages      | POST          | Adds a new message.                                                       |
+| /Messages/{id} | PUT           | Updates an existing message by ID.                                        |
+| /Messages/{id} | GET           | Returns a single message by ID.                                           |
+| /Messages/{id} | DELETE        | Deletes a single message by ID.                                           |
+
+A couple of dummy users have been pre hard-coded for the login-service:
+| Id | First name | Last name | Username | Password |
+| --:| ---------- | --------- | -------- | -------- |
+|  1 | John       | Crichton  | john     | secret   |
+|  2 | Aeryn      | Sun       | aeryn    | secret   |
+
+The service uses a dummy private key (see appsettings.json) for the JWTs:
+```
+  "AppSettings": {
+    "Secret": "USED TO SIGN AND VERIFY JWT - MUST BE KEPT A SECRET"
+  },
+```

@@ -7,6 +7,8 @@ namespace MessageBoardService.Models
     public class Message
     {
         public long Id { get; set; }
+        public long UserId { get; set; }
+
         public DateTime CreationDateTime { get; set; }
 
         [Required]

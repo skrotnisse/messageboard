@@ -2,15 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using MessageBoardService.Models;
 
 namespace MessageBoardService.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
+    [Route("api/[controller]")]
     public class MessagesController : ControllerBase
     {
         private readonly MessageDBContext _context;
@@ -20,9 +23,17 @@ namespace MessageBoardService.Controllers
             return _context.Messages.Any(e => e.Id == id);
         }
 
+        private long GetUserIdByJWTClaim()
+        {
+            var userIdString = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = Convert.ToInt64(userIdString);
+            return userId;
+        }
+
+        // Dummy sanitation to provide some kind of basic protection against XSS-attacks..
+        // This should be more properly implemented for final production code.
         private void SanitizeMessage(Message message)
         {
-            // Dummy sanitation to provide basic protection against XSS-attacks.
             message.Text = message.Text.Replace('<', '.').Replace('>', '.');
             message.Title = message.Title.Replace('<', '.').Replace('>', '.');
         }
@@ -68,12 +79,33 @@ namespace MessageBoardService.Controllers
                 return BadRequest();
             }
 
-            SanitizeMessage(message);
+            var originalMessage = _context.Messages.SingleOrDefault(e => e.Id == id);
+            if (originalMessage == null) {
+                return NotFound();
+            }
 
-            _context.Entry(message).State = EntityState.Modified;
+            // Don't allow users to update each others messages.
+            try
+            {
+                long userId = GetUserIdByJWTClaim();
+                if (userId != originalMessage.UserId)
+                {
+                    return Unauthorized();
+                }
+            }
+            catch
+            {
+                return BadRequest();
+            }
 
             try
             {
+                message.CreationDateTime = originalMessage.CreationDateTime;
+                message.UserId = originalMessage.UserId;
+
+                SanitizeMessage(message);
+
+                _context.Entry(originalMessage).CurrentValues.SetValues(message);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -86,6 +118,10 @@ namespace MessageBoardService.Controllers
                 {
                     throw;
                 }
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
 
             return NoContent();
@@ -103,6 +139,17 @@ namespace MessageBoardService.Controllers
             if (MessageExists(message.Id))
             {
                 return Conflict();
+            }
+
+            // Assign UserID found in JWT to message.
+            try
+            {
+                long userId = GetUserIdByJWTClaim();
+                message.UserId = userId;
+            }
+            catch
+            {
+                return BadRequest();
             }
 
             message.CreationDateTime = DateTime.Now;
@@ -123,6 +170,20 @@ namespace MessageBoardService.Controllers
             if (message == null)
             {
                 return NotFound();
+            }
+
+            // Don't allow users to delete each others messages.
+            try
+            {
+                long userId = GetUserIdByJWTClaim();
+                if (userId != message.UserId)
+                {
+                    return Unauthorized();
+                }
+            }
+            catch
+            {
+                return BadRequest();
             }
 
             _context.Messages.Remove(message);
