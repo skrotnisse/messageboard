@@ -6,16 +6,16 @@ namespace MessageBoardService.Tests.Utilities
 {
     class TestDbData
     {
-        private static List<Message> _messages = new List<Message>()
+        private static List<MessageModel> _messages = new List<MessageModel>()
         {
-            new Message() {
+            new MessageModel() {
                 Id = 1,
                 UserId = 1,
                 CreationDateTime = DateTime.Now,
                 Title = "Test message title #1",
                 Text = "Test message text #1"
             },
-            new Message() {
+            new MessageModel() {
                 Id = 2,
                 UserId = 2,
                 CreationDateTime = DateTime.Now,
@@ -24,7 +24,7 @@ namespace MessageBoardService.Tests.Utilities
             }
         };
 
-        public static List<Message> Messages
+        public static List<MessageModel> Messages
         {
             get { return _messages; }
         }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MessageBoardService.Models
 {
-    public class Message
+    public class MessageModel
     {
         public long Id { get; set; }
         public long UserId { get; set; }

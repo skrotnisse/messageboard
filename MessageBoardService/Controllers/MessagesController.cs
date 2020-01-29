@@ -32,7 +32,7 @@ namespace MessageBoardService.Controllers
 
         // Dummy sanitation to provide some kind of basic protection against XSS-attacks..
         // This should be more properly implemented for final production code.
-        private void SanitizeMessage(Message message)
+        private void SanitizeMessage(MessageModel message)
         {
             message.Text = message.Text.Replace('<', '.').Replace('>', '.');
             message.Title = message.Title.Replace('<', '.').Replace('>', '.');
@@ -72,7 +72,7 @@ namespace MessageBoardService.Controllers
 
         // PUT: api/Messages/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMessage(long id, Message message)
+        public async Task<IActionResult> PutMessage(long id, MessageModel message)
         {
             if (id != message.Id || !ModelState.IsValid)
             {
@@ -129,7 +129,7 @@ namespace MessageBoardService.Controllers
 
         // POST: api/Messages
         [HttpPost]
-        public async Task<IActionResult> PostMessage(Message message)
+        public async Task<IActionResult> PostMessage(MessageModel message)
         {
             if (!ModelState.IsValid)
             {

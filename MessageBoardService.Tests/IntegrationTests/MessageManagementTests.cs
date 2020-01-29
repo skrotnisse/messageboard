@@ -126,7 +126,7 @@ namespace MessageBoardService.Tests
         [Fact]
         public async void Add_Valid_Message_Returns_Success()
         {
-            var messageToAdd = new Message() {
+            var messageToAdd = new MessageModel() {
                 Title = "Added message title",
                 Text = "Added message text"
             };
@@ -160,7 +160,7 @@ namespace MessageBoardService.Tests
         [Fact]
         public async void Add_Valid_Message_Returns_Conflict()
         {
-            var message = new Message() {
+            var message = new MessageModel() {
                 Id = 1,
                 Title = "Added message title",
                 Text = "Added message text"
@@ -181,7 +181,7 @@ namespace MessageBoardService.Tests
         {
             // Setup
             var tooLongTitle = new string('x', 51);
-            var message = new Message() {
+            var message = new MessageModel() {
                 Title = tooLongTitle,
                 Text = "Test text"
             };
@@ -201,7 +201,7 @@ namespace MessageBoardService.Tests
         {
             // Setup
             var tooLongText = new string('x', 501);
-            var message = new Message() {
+            var message = new MessageModel() {
                 Title = "Test title",
                 Text = tooLongText
             };
@@ -220,7 +220,7 @@ namespace MessageBoardService.Tests
         public async void Update_Valid_Message_Returns_NoContent()
         {
             var messageId = 1;
-            var updateMessage = new Message() {
+            var updateMessage = new MessageModel() {
                 Id = messageId,
                 Title = "Updated message title",
                 Text = "Updated message text"
@@ -255,7 +255,7 @@ namespace MessageBoardService.Tests
         public async void Update_Valid_Message_Returns_NotFound()
         {
             var messageId = 12;
-            var message = new Message() {
+            var message = new MessageModel() {
                 Id = messageId,
                 Title = "Updated message title",
                 Text = "Updated message text"
@@ -276,7 +276,7 @@ namespace MessageBoardService.Tests
         public async void Update_Valid_Message_Returns_BadRequest()
         {
             var messageId = 1;
-            var message = new Message() {
+            var message = new MessageModel() {
                 Id = messageId,
                 Title = "Updated message title",
                 Text = "Updated message text"
@@ -296,7 +296,7 @@ namespace MessageBoardService.Tests
         public async void Update_Valid_Message_Returns_Unauthorized()
         {
             var messageId = 2;
-            var message = new Message() {
+            var message = new MessageModel() {
                 Id = messageId,
                 Title = "Updated message title",
                 Text = "Updated message text"
@@ -319,7 +319,7 @@ namespace MessageBoardService.Tests
             // Setup
             var messageId = 1;
             var tooLongTitle = new string('x', 51);
-            var message = new Message() {
+            var message = new MessageModel() {
                 Id = messageId,
                 Title = tooLongTitle,
                 Text = "Test text"
@@ -342,7 +342,7 @@ namespace MessageBoardService.Tests
             // Setup
             var messageId = 1;
             var tooLongText = new string('x', 501);
-            var message = new Message() {
+            var message = new MessageModel() {
                 Id = messageId,
                 Title = "Test title",
                 Text = tooLongText
