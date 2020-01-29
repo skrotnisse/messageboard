@@ -51,11 +51,13 @@ After the image has been created it can be run as a container (include -d to det
 sudo docker run --rm -p 5000:5000 messageboardservice
 ```
 
-# Service access
+# Usage
 
-The service is running a REST API accessible at http://localhost:5000/api.
+The service is running a REST API accessible at http://localhost:5000/api. Note that this service with its current configuration does **NOT** use SSL/TLS (HTTPS), meaning the connection will be insecure.
 
-| URI offset     | Method        | Description                                                               |
+## REST API endpoints
+
+| URI            | Method        | Description                                                               |
 | -------------- |:-------------:| ------------------------------------------------------------------------- |
 | /Login         | POST          | User authentication required before managing messages (generates JWT).    |
 | /Messages      | GET           | Returns a list of all messages.                                           |
@@ -64,16 +66,64 @@ The service is running a REST API accessible at http://localhost:5000/api.
 | /Messages/{id} | GET           | Returns a single message by ID.                                           |
 | /Messages/{id} | DELETE        | Deletes a single message by ID.                                           |
 
-A couple of dummy users have been pre hard-coded for the login-service:
+## Logging in
+
+There exist a couple of predefined users that have been hard-coded for the login-service:
 
 | Id | First name | Last name | Username | Password |
 | --:| ---------- | --------- | -------- | -------- |
 |  1 | John       | Crichton  | john     | secret   |
 |  2 | Aeryn      | Sun       | aeryn    | secret   |
 
-The service uses a dummy private key (see appsettings.json) for the JWTs:
+Login using one of the predefined users, by POST'ing to `/Login` with body e.g:
+```
+{
+  "username": "john",
+  "password": "secret"
+}
+```
+
+Upon successful login a JSON object with a 'token' key-value will be returned. This is the JWT created for this session.
+
+Note that the service uses a dummy private key/secret (see appsettings.json) to sign the JWTs:
 ```
   "AppSettings": {
     "Secret": "USED TO SIGN AND VERIFY JWT - MUST BE KEPT A SECRET"
   },
 ```
+
+## Managing messages
+
+Messages on the board are managed through the `/Messages*` URIs. Each request needs to include a valid JWT in the Authorization HTTP header, using the Bearer schema (see logging in section above).
+
+### Adding new messages
+
+New messages are added by issuing a POST request to the `/Messages` URI. The body needs to include at least a `title` and `text`, e.g:
+```
+{
+  "title": "Message title",
+  "text": "Message text"
+}
+```
+Both `title` and `text` fields are required. The `title` value is only allowed to be between 5 and 50 characters long, and the `text` value is not allowed to be longer than 500 characters.
+
+### Reading messages
+
+Retrieve a complete list of messages on the board by issuing a GET request to the `/Messages` URI. A specific message can be retrieved by issuing a GET request to the `/Messages/{id}` URI where `{id}` is the message identifier.
+
+### Updating existing messages
+
+Existing messages can be updated by issuing a PUT request to the `/Messages/{id}` URI. The `id` of the body needs to match the `{id}` of the URI. E.g. for a URI `/Messages/3`, a body could look like:
+```
+{
+  "id": 3,
+  "title": "Updated message title",
+  "text": "Updated message text"
+}
+```
+
+Similar constraints on the `title` and `text` values apply as for adding new messages (see section above). A user is only allowed to update their own messages.
+
+### Deleting messages
+
+Messages can be deleted by issuing a DELETE request to the `/Messages/{id}` URI. The message with identifier `{id}` will be deleted. A user is only allowed to delete their own messages.
