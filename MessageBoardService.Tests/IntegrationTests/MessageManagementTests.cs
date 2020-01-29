@@ -78,8 +78,6 @@ namespace MessageBoardService.Tests
             string responseBody = await responseMessage.Content.ReadAsStringAsync();
             var messages = JsonConvert.DeserializeObject<JArray>(responseBody).ToObject<List<JObject>>();
 
-            // TODO: Compare to DB seed source
-
             Assert.Equal(2, messages.Count);
         }
 
@@ -100,9 +98,14 @@ namespace MessageBoardService.Tests
             string responseBody = await responseMessage.Content.ReadAsStringAsync();
             var message = JsonConvert.DeserializeObject<JObject>(responseBody);
 
-            // TODO: Compare to DB seed source
+            var dbMessage = TestDbData.Messages.Find(e => e.Id == messageId);
+            Assert.NotNull(dbMessage);
 
-            Assert.Equal(messageId, message["id"]);
+            Assert.Equal(dbMessage.Id, message["id"]);
+            Assert.Equal(dbMessage.CreationDateTime, message["creationDateTime"]);
+            Assert.Equal(dbMessage.UserId, message["userId"]);
+            Assert.Equal(dbMessage.Title, message["title"]);
+            Assert.Equal(dbMessage.Text, message["text"]);
         }
 
         [Fact]
@@ -123,28 +126,35 @@ namespace MessageBoardService.Tests
         [Fact]
         public async void Add_Valid_Message_Returns_Success()
         {
-            var message = new Message() {
+            var messageToAdd = new Message() {
                 Title = "Added message title",
                 Text = "Added message text"
             };
-            var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(messageToAdd), Encoding.UTF8, "application/json");
 
             // Perform
             var postResult = await _client.PostAsync("/api/Messages", content);
 
-            // Verify
+            // Verify result.
             Assert.IsType<HttpResponseMessage>(postResult);
             var postResponseMessage = postResult as HttpResponseMessage;
             Assert.Equal(HttpStatusCode.Created, postResponseMessage.StatusCode);
 
-            // TODO: Compare to DB seed source
-
+            // Verify that reading the message provides the updated message.
             var uri = String.Format("/api/Messages/{0}", 3);
             var getResult = await _client.GetAsync(uri);
 
             Assert.IsType<HttpResponseMessage>(getResult);
             var getResponseMessage = getResult as HttpResponseMessage;
             Assert.Equal(HttpStatusCode.OK, getResponseMessage.StatusCode);
+
+            string getResponseBody = await getResponseMessage.Content.ReadAsStringAsync();
+            var message = JsonConvert.DeserializeObject<JObject>(getResponseBody);
+
+            Assert.Equal(3, message["id"]);
+            Assert.Equal(1, message["userId"]);
+            Assert.Equal(messageToAdd.Title, message["title"]);
+            Assert.Equal(messageToAdd.Text, message["text"]);
         }
 
         [Fact]
@@ -210,23 +220,35 @@ namespace MessageBoardService.Tests
         public async void Update_Valid_Message_Returns_NoContent()
         {
             var messageId = 1;
-            var message = new Message() {
+            var updateMessage = new Message() {
                 Id = messageId,
                 Title = "Updated message title",
                 Text = "Updated message text"
             };
-            var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(updateMessage), Encoding.UTF8, "application/json");
+            var uri = String.Format("/api/Messages/{0}", messageId);
 
             // Perform
-            var uri = String.Format("/api/Messages/{0}", messageId);
             var postResult = await _client.PutAsync(uri, content);
 
-            // Verify
+            // Verify result.
             Assert.IsType<HttpResponseMessage>(postResult);
             var postResponseMessage = postResult as HttpResponseMessage;
             Assert.Equal(HttpStatusCode.NoContent, postResponseMessage.StatusCode);
 
-            // TODO: Compare to DB seed source
+            // Verify that reading the message provides the updated message.
+            var getResult = await _client.GetAsync(uri);
+            Assert.IsType<HttpResponseMessage>(getResult);
+            var getResponseMessage = getResult as HttpResponseMessage;
+            Assert.Equal(HttpStatusCode.OK, getResponseMessage.StatusCode);
+
+            string getResponseBody = await getResponseMessage.Content.ReadAsStringAsync();
+            var message = JsonConvert.DeserializeObject<JObject>(getResponseBody);
+
+            Assert.Equal(updateMessage.Id, message["id"]);
+            Assert.Equal(1, message["userId"]);
+            Assert.Equal(updateMessage.Title, message["title"]);
+            Assert.Equal(updateMessage.Text, message["text"]);
         }
 
         [Fact]

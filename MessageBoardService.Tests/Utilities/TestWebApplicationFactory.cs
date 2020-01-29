@@ -17,25 +17,7 @@ namespace MessageBoardService.Tests.Utilities
     {
         private void InitializeDbForTests(MessageDBContext db)
         {
-            var dbMessages = new List<Message>()
-            {
-                new Message() {
-                    Id = 1,
-                    UserId = 1,
-                    CreationDateTime = DateTime.Now,
-                    Title = "Test message title #1",
-                    Text = "Test message text #1"
-                },
-                new Message() {
-                    Id = 2,
-                    UserId = 2,
-                    CreationDateTime = DateTime.Now,
-                    Title = "Test message title #2",
-                    Text = "Test message text #2"
-                }
-            };
-
-            db.Messages.AddRange(dbMessages);
+            db.Messages.AddRange(TestDbData.Messages);
             db.SaveChanges();
         }
 
