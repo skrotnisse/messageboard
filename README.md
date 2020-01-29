@@ -2,6 +2,10 @@
 
 A small RESTful webapi message-board service written in C# / .NET Core 3.1.
 
+## Disclaimer
+
+This is a PoC service-project that has not been properly reviewed. Do **NOT** use this in any sort of production environment.
+
 # Development setup
 
 This section describes how to setup a local development environment to run the service and test cases.
