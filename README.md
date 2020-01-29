@@ -68,7 +68,7 @@ The service is running a REST API accessible at http://localhost:5000/api. Note 
 
 ## Logging in
 
-There exist a couple of predefined users that have been hard-coded for the login-service:
+A couple of predefined users have been hard-coded for the login-service:
 
 | Id | First name | Last name | Username | Password |
 | --:| ---------- | --------- | -------- | -------- |
