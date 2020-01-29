@@ -9,6 +9,6 @@ namespace MessageBoardService.Models
         {
         }
 
-        public DbSet<Message> Messages { get; set; }
+        public DbSet<MessageModel> Messages { get; set; }
     }
 }
